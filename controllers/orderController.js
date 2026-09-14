@@ -7,7 +7,7 @@ export async function placeOrder(req, res) {
 
     let customerId = null;
     if (customer) {
-      const existing = customer.email ? await customerModel.findCustomerByEmail(customer.email) : null;
+      const existing = customer.phone ? await customerModel.findCustomerbyPhoneNumber(customer.phone) : null;
       if (existing) {
         customerId = existing.id;
       } else {

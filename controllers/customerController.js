@@ -3,7 +3,7 @@ import * as customerModel from '../models/customerModel.js';
 export async function createCustomer(req, res) {
   try {
     const { name, email, phone, address } = req.body;
-    if (!name || !email) return res.status(400).json({ error: 'name and email are required' });
+    if (!name || !phone) return res.status(400).json({ error: 'name and phone are required' });
 
     const payload = { name, email, phone, address };
     const customer = await customerModel.createCustomer(payload);
@@ -15,8 +15,8 @@ export async function createCustomer(req, res) {
 
 export async function getCustomer(req, res) {
   try {
-    const identifier = req.params.email;
-    const customer = await customerModel.findCustomerByEmail(identifier);
+    const identifier = req.params.phoneNumber;
+    const customer = await customerModel.findCustomerbyPhoneNumber(identifier);
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
     res.json({ data: customer });
   } catch (err) {

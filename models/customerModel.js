@@ -12,8 +12,8 @@ export async function getCustomerById(id) {
   return data;
 }
 
-export async function findCustomerByEmail(email) {
-  const { data, error } = await supabase.from('customers').select('*').eq('email', email).limit(1);
+export async function findCustomerbyPhoneNumber(phone) {
+  const { data, error } = await supabase.from('customers').select('*').eq('phone', phone).limit(1);
   if (error) throw error;
   return Array.isArray(data) ? data[0] : data;
 }
