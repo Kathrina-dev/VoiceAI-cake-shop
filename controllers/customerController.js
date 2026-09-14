@@ -16,7 +16,7 @@ export async function createCustomer(req, res) {
 export async function getCustomer(req, res) {
   try {
     const identifier = req.params.phoneNumber;
-    const customer = await customerModel.findCustomerbyPhoneNumber(identifier);
+    const customer = await customerModel.getCustomerById(identifier);
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
     res.json({ data: customer });
   } catch (err) {
