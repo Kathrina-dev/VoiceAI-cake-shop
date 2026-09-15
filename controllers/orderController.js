@@ -3,19 +3,12 @@ import * as customerModel from '../models/customerModel.js';
 
 export async function placeOrder(req, res) {
   try {
-    const { cake_name, quantity, notes } = req.body;
+    const { items, notes } = req.body;
     const customerId = req.params.customerId; 
 
     if (!customerId) {
       return res.status(400).json({ error: 'Missing customer-id in URL path parameter' });
     }
-
-    const orderItems = items || [
-      {
-        cake_name: cake_name,
-        quantity: quantity || 1
-      }
-    ];
 
     const order = await orderModel.createOrder({ customer_id: customerId, items:orderItems, notes });
     res.status(201).json(order);
