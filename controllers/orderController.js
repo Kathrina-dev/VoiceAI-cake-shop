@@ -3,21 +3,15 @@ import * as customerModel from '../models/customerModel.js';
 
 export async function placeOrder(req, res) {
   try {
-    const { customer, items, notes } = req.body;
+    const { items, notes } = req.body;
+    const customerId = req.params.customerId; 
 
-    let customerId = null;
-    if (customer) {
-      const existing = customer.phone ? await customerModel.getCustomerById(customer.phone) : null;
-      if (existing) {
-        customerId = existing.id;
-      } else {
-        const created = await customerModel.createCustomer(customer);
-        customerId = created.id;
-      }
+    if (!customerId) {
+      return res.status(400).json({ error: 'Missing customer-id in URL path parameter' });
     }
 
     const order = await orderModel.createOrder({ customer_id: customerId, items, notes });
-    res.status(201).json({ data: order });
+    res.status(201).json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -25,10 +19,10 @@ export async function placeOrder(req, res) {
 
 export async function updateOrder(req, res) {
   try {
-    const id = req.params.id;
+    const orderId = req.params.orderId;
     const changes = req.body;
-    const updated = await orderModel.updateOrder(id, changes);
-    res.json({ data: updated });
+    const updated = await orderModel.updateOrder(orderId, changes);
+    res.json(updated);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -36,8 +30,8 @@ export async function updateOrder(req, res) {
 
 export async function deleteOrder(req, res) {
   try {
-    const id = req.params.id;
-    await orderModel.deleteOrder(id);
+    const orderId = req.params.orderId;
+    await orderModel.deleteOrder(orderId);
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -46,11 +40,11 @@ export async function deleteOrder(req, res) {
 
 export async function listOrders(req, res) {
   try {
-    const id = req.params.id;
-    const customer = await customerModel.getCustomerById(id);
+    const customerId = req.params.customerId;
+    const customer = await customerModel.getCustomerById(customerId);
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
     const orders = await orderModel.listOrders({ customer_id: customer.id });
-    res.json({ data: orders });
+    res.json(orders);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

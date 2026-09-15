@@ -11,11 +11,9 @@ async function fetchItemsForOrder(orderId) {
 }
 
 export async function createOrder(payload) {
-  // payload: { customer_id, items: [{ cake_id, quantity }], status, notes }
   const { customer_id, items, status = 'pending', notes = null } = payload;
   if (!items || !Array.isArray(items) || items.length === 0) throw new Error('Order must contain at least one item');
 
-  // calculate prices and total
   const enriched = [];
   let total = 0;
   for (const it of items) {
@@ -35,21 +33,17 @@ export async function createOrder(payload) {
   const { data: insertedItems, error: itemsErr } = await supabase.from('order_items').insert(itemsToInsert).select();
   if (itemsErr) throw itemsErr;
 
-  // attach items with cake details
   const itemsWithCakes = await fetchItemsForOrder(order.id);
   return { ...order, items: itemsWithCakes };
 }
 
 export async function updateOrder(id, changes) {
-  // changes may include status, notes, items (array to replace)
   changes = changes || {};
   changes.updated_at = new Date().toISOString();
 
   let newTotal = null;
   if (changes.items) {
-    // replace items: delete existing and insert new
     const items = changes.items;
-    // calculate new total and enriched items
     const enriched = [];
     let total = 0;
     for (const it of items) {
@@ -63,7 +57,6 @@ export async function updateOrder(id, changes) {
       enriched.push({ order_id: id, cake_id: cake.id, cake_name, quantity, unit_price, subtotal });
     }
     newTotal = total;
-    // delete old items
     const { error: delErr } = await supabase.from('order_items').delete().eq('order_id', id);
     if (delErr) throw delErr;
     const { error: insErr } = await supabase.from('order_items').insert(enriched);
@@ -81,23 +74,25 @@ export async function updateOrder(id, changes) {
 }
 
 export async function deleteOrder(id) {
-  // deleting order will cascade delete order_items
   const { data, error } = await supabase.from('orders').delete().eq('id', id).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function listOrders(filter = {}) {
-  // filter: { customer_id }
   let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
   if (filter.customer_id) query = query.eq('customer_id', filter.customer_id);
+  
   const { data, error } = await query;
   if (error) throw error;
-  // attach items for each order
+
   const results = [];
-  for (const o of data) {
+  const ordersList = data || [];
+
+  for (const o of ordersList) {
     const items = await fetchItemsForOrder(o.id);
     results.push({ ...o, items });
   }
   return results;
 }
+
