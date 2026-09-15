@@ -10,18 +10,32 @@ export async function placeOrder(req, res) {
       return res.status(400).json({ error: 'Missing customer-id in URL path parameter' });
     }
 
-    const order = await orderModel.createOrder({ customer_id: customerId, items:orderItems, notes });
+    const order = await orderModel.createOrder({ customer_id: customerId, items, notes });
     res.status(201).json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
 
+// export async function updateOrder(req, res) {
+//   try {
+//     const orderId = req.params.orderId;
+//     const changes = req.body;
+//     const updated = await orderModel.updateOrder(orderId, changes);
+//     res.json(updated);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// }
+
 export async function updateOrder(req, res) {
   try {
     const orderId = req.params.orderId;
-    const changes = req.body;
+
+    const { orderId: _bodyOrderId, ...changes } = req.body;
+
     const updated = await orderModel.updateOrder(orderId, changes);
+
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: err.message });
