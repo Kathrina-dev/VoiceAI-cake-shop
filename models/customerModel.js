@@ -13,7 +13,7 @@ export async function getCustomerById(id) {
 }
 
 export async function findCustomerbyPhoneNumber(phone) {
-  const { data, error } = await supabase.from('customers').select('*').eq('phone', phone).limit(1);
+  const { data, error } = await supabase.from('customers').select('*').eq('phone', phone).maybeSingle();
   if (error) throw error;
-  return Array.isArray(data) ? data[0] : data;
+  return data;
 }
