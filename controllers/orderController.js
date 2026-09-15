@@ -17,17 +17,6 @@ export async function placeOrder(req, res) {
   }
 }
 
-// export async function updateOrder(req, res) {
-//   try {
-//     const orderId = req.params.orderId;
-//     const changes = req.body;
-//     const updated = await orderModel.updateOrder(orderId, changes);
-//     res.json(updated);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// }
-
 export async function updateOrder(req, res) {
   try {
     const orderId = req.params.orderId;
@@ -45,13 +34,21 @@ export async function updateOrder(req, res) {
 export async function deleteOrder(req, res) {
   try {
     const orderId = req.params.orderId;
-    await orderModel.deleteOrder(orderId);
-    res.status(204).send();
+
+    const deleted = await orderModel.deleteOrder(orderId);
+
+    res.status(200).json({
+      success: true,
+      message: "Order deleted successfully"
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("deleteOrder error:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
   }
 }
-
 export async function listOrders(req, res) {
   try {
     const customerId = req.params.customerId;
