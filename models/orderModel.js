@@ -39,6 +39,7 @@ export async function createOrder(payload) {
 
 export async function updateOrder(id, changes) {
   changes = changes || {};
+  delete changes.orderId;
   changes.updated_at = new Date().toISOString();
 
   let newTotal = null;
